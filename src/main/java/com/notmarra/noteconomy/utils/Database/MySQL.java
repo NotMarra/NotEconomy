@@ -71,4 +71,22 @@ public class MySQL extends NotMySQL implements IEconomyDatabase {
         }
     }
 
+    @Override
+    public double getBalance(Player player, String currency) {
+        try {
+            NotTable table = getTable(currency);
+            if (table == null) {
+                NotEconomy.dbg().log(NotDebugger.C_ERROR, "Table " + table + " is null!");
+                return 0;
+            }
+            return table
+                    .selectOne(b -> b.whereEquals(UUID, player.getUniqueId().toString()))
+                    .getDouble(BALANCE);
+        } catch (Exception e) {
+            NotEconomy.dbg().log(NotDebugger.C_ERROR,
+                    "Error checking player's balance: " + e);
+            return 0;
+        }
+    }
+
 }

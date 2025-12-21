@@ -4,12 +4,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerJoinEvent;
 
-import com.notmarra.noteconomy.NotEconomy;
+import com.notmarra.noteconomy.economy.Economy;
 import com.notmarra.notlib.extensions.NotListener;
 import com.notmarra.notlib.extensions.NotPlugin;
 import com.notmarra.notlib.utils.NotScheduler;
 
 public class PlayerJoin extends NotListener {
+    Economy economy = new Economy();
 
     public PlayerJoin(NotPlugin plugin) {
         super(plugin);
@@ -26,9 +27,7 @@ public class PlayerJoin extends NotListener {
 
         NotScheduler scheduler = new NotScheduler(plugin);
         scheduler.runTaskAsync(() -> {
-            if (!NotEconomy.getDB().playerExists(p)) {
-                NotEconomy.getDB().setupPlayer(p);
-            }
+            economy.setupPlayer(p);
         });
     }
 }

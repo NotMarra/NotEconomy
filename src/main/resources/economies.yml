@@ -1,0 +1,13 @@
+# ID of economy
+money:
+  # Starting balance for players
+  default_value: 0
+  symbol: "$"
+  singular: "$"
+  plural: "$"
+  # Whether players can use /pay feature for this currency
+  can_send: true
+  # Whether to use decimals
+  decimal: true
+  # Whether to hook balance with Vault
+  vault: true

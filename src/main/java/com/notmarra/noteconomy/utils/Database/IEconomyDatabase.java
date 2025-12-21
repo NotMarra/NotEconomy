@@ -9,5 +9,7 @@ public interface IEconomyDatabase {
 
     boolean setupPlayer(Player player);
 
+    double getBalance(Player player, String currency);
+
     NotDatabase asNotDatabase();
 }
