@@ -1,6 +1,10 @@
 package com.notmarra.noteconomy;
 
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+
 import com.notmarra.noteconomy.economy.EconomyCache;
+import com.notmarra.noteconomy.economy.PlayerBalance;
 import com.notmarra.noteconomy.listeners.PlayerJoin;
 import com.notmarra.noteconomy.utils.Database.IEconomyDatabase;
 import com.notmarra.noteconomy.utils.Database.MySQL;
@@ -9,6 +13,7 @@ import com.notmarra.notlib.cache.NotCache;
 import com.notmarra.notlib.extensions.NotPlugin;
 import com.notmarra.notlib.utils.ChatF;
 import com.notmarra.notlib.utils.NotDebugger;
+import com.notmarra.notlib.utils.NotScheduler;
 
 public final class NotEconomy extends NotPlugin {
     private static NotEconomy instance;
@@ -32,11 +37,16 @@ public final class NotEconomy extends NotPlugin {
 
         addListener(new PlayerJoin(instance));
         NotCache.getInstance().registerCache("balances", economyCache);
+        NotScheduler scheduler = new NotScheduler(instance);
+        scheduler.runTaskTimerAsync(() -> {
+            saveCacheToDatabase();
+        }, 6000L, 6000L);
     }
 
     @Override
     public void onNotPluginEnable() {
         instance = this;
+        saveCacheToDatabase();
         NotCache.getInstance().unregisterCache("balances");
 
         log().info(ChatF.of("NotEconomy started succefully!").build());
@@ -74,5 +84,18 @@ public final class NotEconomy extends NotPlugin {
 
     public static EconomyCache getEC() {
         return getInstance().getEconomyCache();
+    }
+
+    private void saveCacheToDatabase() {
+        EconomyCache cache = NotEconomy.getEC();
+        var allBalances = cache.getAllCachedData();
+
+        if (allBalances.isEmpty())
+            return;
+
+        for (PlayerBalance pb : allBalances) {
+            Player p = Bukkit.getPlayer(pb.getPlayerUuid());
+            getDB().updateBalance(p, pb.getCurrencyId(), pb.getBalance());
+        }
     }
 }

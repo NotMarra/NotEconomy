@@ -22,7 +22,7 @@ public class EconomyCache extends BaseNotCache<PlayerBalance> {
         return get(key);
     }
 
-    public Collection<PlayerBalance> getAllBalances() {
+    public Collection<PlayerBalance> getAllCachedData() {
         return getStorage().values();
     }
 }
