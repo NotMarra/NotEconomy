@@ -1,15 +1,15 @@
 package com.notmarra.noteconomy;
 
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-
 import com.notmarra.noteconomy.economy.EconomyCache;
+import com.notmarra.noteconomy.economy.EconomyCommandGroup;
 import com.notmarra.noteconomy.economy.PlayerBalance;
 import com.notmarra.noteconomy.listeners.PlayerJoin;
+import com.notmarra.noteconomy.listeners.PlayerQuit;
 import com.notmarra.noteconomy.utils.Database.IEconomyDatabase;
 import com.notmarra.noteconomy.utils.Database.MySQL;
 import com.notmarra.noteconomy.utils.Database.SQLite;
 import com.notmarra.notlib.cache.NotCache;
+import com.notmarra.notlib.extensions.NotLangId;
 import com.notmarra.notlib.extensions.NotPlugin;
 import com.notmarra.notlib.utils.ChatF;
 import com.notmarra.notlib.utils.NotDebugger;
@@ -23,9 +23,13 @@ public final class NotEconomy extends NotPlugin {
 
     @Override
     public void initNotPlugin() {
+        instance = this;
         saveDefaultConfig("currencies.yml");
+        saveDefaultConfig("lang/en.yml");
         reloadConfig("currencies.yml");
         String type = getConfig().getString("data.type", "SQLite");
+        tm().setDefaultLangFolder("lang");
+        tm().registerLangs(NotLangId.EN);
 
         if (type.equalsIgnoreCase("MySQL")) {
             dbInstance = new MySQL(this, "config.yml");
@@ -36,25 +40,32 @@ public final class NotEconomy extends NotPlugin {
         db().registerDatabase(dbInstance.asNotDatabase());
 
         addListener(new PlayerJoin(instance));
+        addListener(new PlayerQuit(this));
+
+        this.economyCache = new EconomyCache(instance);
         NotCache.getInstance().registerCache("balances", economyCache);
+
         NotScheduler scheduler = new NotScheduler(instance);
         scheduler.runTaskTimerAsync(() -> {
             saveCacheToDatabase();
         }, 6000L, 6000L);
+
+        addCommandGroup(new EconomyCommandGroup(instance));
     }
 
     @Override
     public void onNotPluginEnable() {
         instance = this;
-        saveCacheToDatabase();
-        NotCache.getInstance().unregisterCache("balances");
 
         log().info(ChatF.of("NotEconomy started succefully!").build());
     }
 
     @Override
     public void onNotPluginDisable() {
-        db().close();
+        if (economyCache != null) {
+            saveCacheToDatabase();
+            NotCache.getInstance().unregisterCache("balances");
+        }
         log().info(ChatF.of("NotEconomy shut down succefully!").build());
     }
 
@@ -94,8 +105,7 @@ public final class NotEconomy extends NotPlugin {
             return;
 
         for (PlayerBalance pb : allBalances) {
-            Player p = Bukkit.getPlayer(pb.getPlayerUuid());
-            getDB().updateBalance(p, pb.getCurrencyId(), pb.getBalance());
+            getDB().updateBalance(pb.getPlayerUuid(), pb.getCurrencyId(), pb.getBalance());
         }
     }
 }

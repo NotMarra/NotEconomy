@@ -3,8 +3,8 @@ money:
   # Starting balance for players
   default_value: 0
   symbol: "$"
-  singular: "$"
-  plural: "$"
+  singular: "coin"
+  plural: "coins"
   # Whether players can use /pay feature for this currency
   can_send: true
   # Whether to use decimals

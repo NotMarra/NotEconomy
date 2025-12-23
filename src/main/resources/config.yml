@@ -1,8 +1,10 @@
+lang: en
+
 data:
   # Database type: SQLite or MySQL
   type: "SQLite"
   # SQLite Configuration (Used if type is SQLite)
-  file: "data"
+  file: "data.sql"
   # MySQL Configuration (Used if type is MySQL)
   mysql:
     host: "127.0.0.1"

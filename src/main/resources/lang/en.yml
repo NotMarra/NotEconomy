@@ -1,0 +1,27 @@
+prefix: "<gradient:#00a3ff:#0067bf>ɴᴏᴛᴇᴄᴏɴᴏᴍʏ</gradient> <dark_gray>»</dark_gray> <white>"
+
+# Economy messages
+economy:
+  # Available placeholders for format: %amount%, %symbol%, %plural%, %singular%, %name%
+  format: "%amount%%symbol%"
+  balance: "You currently have <#00a3ff>%amount%</#00a3ff>"
+  target-not-found: "<red>Player not found!</red>"
+
+  # Command prompts (when arguments are missing)
+  prompt-player: "Please specify a player."
+  prompt-amount: "Please specify an amount."
+
+  # Actions
+  add:
+    sender: "Added <#00a3ff>%amount%</#00a3ff> to <#0067bf>%player%</#0067bf>'s balance."
+    receiver: "You have received <#00a3ff>%amount%</#00a3ff>."
+  remove:
+    sender: "Removed <red>%amount%</red> from <#0067bf>%player%</#0067bf>'s balance."
+    receiver: "An amount of <red>%amount%</red> was withdrawn from your balance."
+  set:
+    sender: "Set <#0067bf>%player%</#0067bf>'s balance to <#00a3ff>%amount%</#00a3ff>."
+    receiver: "Your balance has been set to <#00a3ff>%amount%</#00a3ff>."
+
+  # Errors
+  insufficient-funds: "<red>You do not have enough %name%!</red>"
+  pay-disabled: "<red>Sending %name% is disabled for this currency.</red>"

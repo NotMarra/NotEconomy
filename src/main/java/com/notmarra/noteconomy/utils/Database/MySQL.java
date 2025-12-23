@@ -2,6 +2,7 @@ package com.notmarra.noteconomy.utils.Database;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.bukkit.entity.Player;
 
@@ -15,7 +16,7 @@ import com.notmarra.notlib.extensions.NotPlugin;
 import com.notmarra.notlib.utils.NotDebugger;
 
 public class MySQL extends NotMySQL implements IEconomyDatabase {
-    public final Set<String> TABLES = Currencies.getCurrencies();
+    public final Set<String> TABLES = Currencies.getCurrencies(plugin);
     public final String UUID = "uuid";
     public final String PLAYER = "player";
     public final String BALANCE = "balance";
@@ -43,28 +44,29 @@ public class MySQL extends NotMySQL implements IEconomyDatabase {
         return this;
     }
 
+    @Override
     public boolean setupPlayer(Player player) {
-        try {
-            for (String id : TABLES) {
+        String uuidStr = player.getUniqueId().toString();
+
+        for (String id : TABLES) {
+            try {
                 NotTable table = getTable(id);
-                if (table == null) {
-                    return false;
-                }
+                if (table == null)
+                    continue;
 
-                if (!table.exists(b -> b.whereEquals(UUID, player.getUniqueId().toString()))) {
+                boolean playerExists = table.exists(builder -> builder.whereEquals(UUID, uuidStr));
+
+                if (!playerExists) {
                     table.insertRow(List.of(
-                            player.getUniqueId().toString(),
+                            uuidStr,
                             player.getName(),
-                            0));
+                            0.0));
                 }
-
+            } catch (Exception e) {
+                NotEconomy.dbg().log(NotDebugger.C_ERROR, "Chyba při setupu měny " + id + ": " + e.getMessage());
             }
-            return true;
-        } catch (Exception e) {
-            NotEconomy.dbg().log(NotDebugger.C_ERROR,
-                    "Error setting up player " + player.getName() + ": " + e.getMessage());
-            return false;
         }
+        return true;
     }
 
     @Override
@@ -104,7 +106,20 @@ public class MySQL extends NotMySQL implements IEconomyDatabase {
     }
 
     @Override
-    public void updateBalance(Player player, String currency, double balance) {
-        setBalance(player, currency, balance);
+    public void updateBalance(UUID player, String currency, double balance) {
+        try {
+            NotTable table = getTable(currency);
+            if (table == null) {
+                NotEconomy.dbg().log(NotDebugger.C_ERROR, "Table " + table + " is null!");
+                return;
+            }
+            table
+                    .selectOne(b -> b.whereEquals(UUID, player.toString()))
+                    .set(BALANCE, balance);
+        } catch (Exception e) {
+            NotEconomy.dbg().log(NotDebugger.C_ERROR,
+                    "Error setting player's balance: " + e);
+            return;
+        }
     }
 }
