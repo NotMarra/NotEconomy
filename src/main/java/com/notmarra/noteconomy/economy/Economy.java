@@ -1,5 +1,8 @@
 package com.notmarra.noteconomy.economy;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.configuration.file.FileConfiguration;
@@ -7,9 +10,11 @@ import org.bukkit.entity.Player;
 import com.notmarra.noteconomy.NotEconomy;
 import com.notmarra.noteconomy.utils.Currencies;
 import com.notmarra.noteconomy.utils.Database.IEconomyDatabase;
+import com.notmarra.noteconomy.utils.Database.IEconomyDatabase.TopEntry;
 
 public class Economy {
     private final IEconomyDatabase db = NotEconomy.getDB();
+    private static final Map<String, List<TopEntry>> topCache = new HashMap<>();
 
     public void setupPlayer(UUID uuid) {
         db.setupPlayer(uuid);
@@ -120,5 +125,16 @@ public class Economy {
         if (amount >= 1_000)
             return String.format("%.1fk", amount / 1_000.0);
         return String.valueOf(amount);
+    }
+
+    public void updateTopCache(String currencyId) {
+        topCache.put(currencyId, db.getTopBalances(currencyId, 10));
+    }
+
+    public TopEntry getTopEntry(String currencyId, int rank) {
+        java.util.List<TopEntry> list = topCache.getOrDefault(currencyId, new java.util.ArrayList<>());
+        if (rank <= 0 || rank > list.size())
+            return new TopEntry("---", 0);
+        return list.get(rank - 1);
     }
 }

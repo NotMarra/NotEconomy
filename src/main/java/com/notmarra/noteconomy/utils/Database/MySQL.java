@@ -57,7 +57,7 @@ public class MySQL extends NotMySQL implements IEconomyDatabase {
                 if (!playerExists) {
                     table.insertRow(List.of(
                             uuid,
-                            Bukkit.getPlayer(uuid),
+                            Bukkit.getOfflinePlayer(uuid).getName(),
                             0.0));
                 }
             } catch (Exception e) {
@@ -94,8 +94,10 @@ public class MySQL extends NotMySQL implements IEconomyDatabase {
                 return;
             }
             table
-                    .selectOne(b -> b.whereEquals(UUID, uuid.toString()))
-                    .set(BALANCE, balance);
+                    .update(b -> {
+                        b.whereEquals(UUID, uuid.toString());
+                        b.set(BALANCE, balance);
+                    });
         } catch (Exception e) {
             NotEconomy.dbg().log(NotDebugger.C_ERROR,
                     "Error setting player's balance: " + e);
@@ -106,5 +108,24 @@ public class MySQL extends NotMySQL implements IEconomyDatabase {
     @Override
     public void updateBalance(UUID uuid, String currency, double balance) {
         setBalance(uuid, currency, balance);
+    }
+
+    @Override
+    public List<TopEntry> getTopBalances(String currency, int limit) {
+        List<TopEntry> top = new java.util.ArrayList<>();
+        try {
+            NotTable table = getTable(currency);
+            if (table == null)
+                return top;
+
+            var rows = table.select(b -> b.orderByDesc(BALANCE).limit(limit));
+
+            for (var row : rows) {
+                top.add(new TopEntry(row.getString(PLAYER), row.getDouble(BALANCE)));
+            }
+        } catch (Exception e) {
+            NotEconomy.dbg().log(NotDebugger.C_ERROR, "Error with loading TOP: " + e.getMessage());
+        }
+        return top;
     }
 }
