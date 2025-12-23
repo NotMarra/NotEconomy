@@ -1,5 +1,9 @@
 lang: en
 
+vault:
+  enabled: true
+  currency_id: "money"
+
 data:
   # Database type: SQLite or MySQL
   type: "SQLite"

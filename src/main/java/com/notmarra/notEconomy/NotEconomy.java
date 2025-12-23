@@ -1,8 +1,11 @@
 package com.notmarra.noteconomy;
 
+import org.bukkit.plugin.ServicePriority;
+
 import com.notmarra.noteconomy.economy.EconomyCache;
 import com.notmarra.noteconomy.economy.EconomyCommandGroup;
 import com.notmarra.noteconomy.economy.PlayerBalance;
+import com.notmarra.noteconomy.hooks.VaultHook;
 import com.notmarra.noteconomy.listeners.PlayerJoin;
 import com.notmarra.noteconomy.listeners.PlayerQuit;
 import com.notmarra.noteconomy.utils.Database.IEconomyDatabase;
@@ -14,6 +17,8 @@ import com.notmarra.notlib.extensions.NotPlugin;
 import com.notmarra.notlib.utils.ChatF;
 import com.notmarra.notlib.utils.NotDebugger;
 import com.notmarra.notlib.utils.NotScheduler;
+
+import net.milkbowl.vault.economy.Economy;
 
 public final class NotEconomy extends NotPlugin {
     private static NotEconomy instance;
@@ -56,6 +61,12 @@ public final class NotEconomy extends NotPlugin {
     @Override
     public void onNotPluginEnable() {
         instance = this;
+
+        if (getConfig().getBoolean("vault.enabled", false)
+                && getServer().getPluginManager().getPlugin("Vault") != null) {
+            getServer().getServicesManager().register(Economy.class, new VaultHook(), this, ServicePriority.Normal);
+            log().info("NotEconomy successfully hooked into Vault!");
+        }
 
         log().info(ChatF.of("NotEconomy started succefully!").build());
     }
