@@ -11,6 +11,7 @@ import com.notmarra.noteconomy.hooks.VaultHook;
 import com.notmarra.noteconomy.listeners.PlayerJoin;
 import com.notmarra.noteconomy.listeners.PlayerQuit;
 import com.notmarra.noteconomy.utils.Currencies;
+import com.notmarra.noteconomy.utils.UniversalCommandGroup;
 import com.notmarra.noteconomy.utils.Database.IEconomyDatabase;
 import com.notmarra.noteconomy.utils.Database.MySQL;
 import com.notmarra.noteconomy.utils.Database.SQLite;
@@ -59,11 +60,13 @@ public final class NotEconomy extends NotPlugin {
         }, 6000L, 6000L);
 
         addCommandGroup(new EconomyCommandGroup(instance));
+        addCommandGroup(new UniversalCommandGroup(instance));
     }
 
     @Override
     public void onNotPluginEnable() {
         instance = this;
+        debugger = new NotDebugger(instance);
 
         if (getConfig().getBoolean("vault.enabled", false)
                 && getServer().getPluginManager().getPlugin("Vault") != null) {
@@ -133,5 +136,25 @@ public final class NotEconomy extends NotPlugin {
         for (String currency : Currencies.getCurrencies(instance)) {
             new Economy().updateTopCache(currency);
         }
+    }
+
+    private void reloadC() {
+        NotScheduler scheduler = new NotScheduler(instance);
+        scheduler.runTaskAsync(() -> {
+            if (economyCache != null) {
+                saveCacheToDatabase();
+                NotCache.getInstance().unregisterCache("balances");
+                economyCache = null;
+            }
+        });
+        scheduler.runTaskAsync(() -> {
+            this.economyCache = new EconomyCache(instance);
+            NotCache.getInstance().registerCache("balances", economyCache);
+            updateTopCache();
+        });
+    }
+
+    public static void reloadCache() {
+        getInstance().reloadC();
     }
 }

@@ -1,27 +1,40 @@
 prefix: "<gradient:#00a3ff:#0067bf>ɴᴏᴛᴇᴄᴏɴᴏᴍʏ</gradient> <dark_gray>»</dark_gray> <white>"
 
+universal:
+  reloaded: "%prefix%Plugin succefully reloaded!"
+
 # Economy messages
 economy:
   # Available placeholders for format: %amount%, %symbol%, %plural%, %singular%, %name%
   format: "%amount%%symbol%"
-  balance: "You currently have <#00a3ff>%amount%</#00a3ff>"
-  target-not-found: "<red>Player not found!</red>"
+  balance: "%prefix%You currently have <#00a3ff>%amount%</#00a3ff>"
+  target-not-found: "%prefix%<red>Player not found!</red>"
 
   # Command prompts (when arguments are missing)
-  prompt-player: "Please specify a player."
-  prompt-amount: "Please specify an amount."
+  prompt-player: "%prefix%Please specify a player."
+  prompt-amount: "%prefix%Please specify an amount."
 
   # Actions
   add:
-    sender: "Added <#00a3ff>%amount%</#00a3ff> to <#0067bf>%player%</#0067bf>'s balance."
-    receiver: "You have received <#00a3ff>%amount%</#00a3ff>."
+    sender: "%prefix%Added <#00a3ff>%amount%</#00a3ff> to <#0067bf>%player%</#0067bf>'s balance."
+    receiver: "%prefix%You have received <#00a3ff>%amount%</#00a3ff>."
   remove:
-    sender: "Removed <red>%amount%</red> from <#0067bf>%player%</#0067bf>'s balance."
-    receiver: "An amount of <red>%amount%</red> was withdrawn from your balance."
+    sender: "%prefix%Removed <red>%amount%</red> from <#0067bf>%player%</#0067bf>'s balance."
+    receiver: "%prefix%An amount of <red>%amount%</red> was withdrawn from your balance."
   set:
-    sender: "Set <#0067bf>%player%</#0067bf>'s balance to <#00a3ff>%amount%</#00a3ff>."
-    receiver: "Your balance has been set to <#00a3ff>%amount%</#00a3ff>."
+    sender: "%prefix%Set <#0067bf>%player%</#0067bf>'s balance to <#00a3ff>%amount%</#00a3ff>."
+    receiver: "%prefix%Your balance has been set to <#00a3ff>%amount%</#00a3ff>."
 
   # Errors
-  insufficient-funds: "<red>You do not have enough %name%!</red>"
-  pay-disabled: "<red>Sending %name% is disabled for this currency.</red>"
+  insufficient-funds: "%prefix%<red>You do not have enough %name%!</red>"
+  pay-disabled: "%prefix%<red>Sending %name% is disabled for this currency.</red>"
+
+  help:
+    - "<dark_gray>------------------ <#00a3ff>ɴᴏᴛᴇᴄᴏɴᴏᴍʏ</#00a3ff> <dark_gray>------------------"
+    - "<gray>/%currency_id% <white>- View your current balance"
+    - "<gray>/%currency_id% add <player> <amount> <white>- Add money to a player's balance"
+    - "<gray>/%currency_id% remove <player> <amount> <white>- Remove money from a player's balance"
+    - "<gray>/%currency_id% set <player> <amount> <white>- Set a player's balance to a specific amount"
+    - "<dark_gray>----------------------------------------------"
+
+  currency_list: "%prefix%Currencies: %list%"
